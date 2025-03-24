@@ -31,7 +31,7 @@ function onEdit(e) {
 
   /**
    * Código de color en formato hexadecimal.
-   */
+   * /
   var colorCorrecto = '#B4D3B2' ; // Verde
   var colorIncorrecto = '#FF0000' ; // Rojo
 
@@ -88,8 +88,8 @@ function onEdit(e) {
           if (valorFamilia === "" || valorGenero === "") {
               celdaFamilia.setBackground(colorIncorrecto) ;
               celdaGenero.setBackground(colorIncorrecto) ;
-              celdaFamilia.setComment("Error: No puede estar vacía si MEXU tiene valor.") ;
-              celdaGenero.setComment("Error: No puede estar vacía si MEXU tiene valor.") ;
+              celdaFamilia.setComment("Error: Esta celda no puede estar vacía si MEXUw tiene valor.") ;
+              celdaGenero.setComment("Error: Esta celda no puede estar vacía si MEXUw tiene valor.") ;
           } 
           if(valorGenero != ""){
               celdaGenero.setBackground(null) ;
@@ -197,5 +197,14 @@ function onEdit(e) {
       celdaMunicipio.setBackground(null) ;
     }
   }
+
+
+
+
+
+
+
+//VERIFICACION DE LOS AUTORES.
+//VERIFICACION EN NEGATIVO DE GENEROS.
 
 
