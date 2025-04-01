@@ -58,8 +58,7 @@ function onEdit(e) {
       celdaFamilia.setBackground(colorIncorrecto) ; 
       celdaFamilia.setComment("Error : esta familia no está en la lista válida.") ; 
     }else{
-      celdaFamilia.setBackground(colorCorrecto) ; 
-      celdaFamilia.setComment(null) ;
+      celdaFamilia.setBackground(colorCorrecto).setComment(null) ;
     }
     if(valorFamilia === ""){
       celdaFamilia.setBackground(null) ;
@@ -86,19 +85,15 @@ function onEdit(e) {
       if (valorMEXU.includes("MEXUw")) {
           // Validar que Familia y Género no estén vacíos
           if (valorFamilia === "" || valorGenero === "") {
-              celdaFamilia.setBackground(colorIncorrecto) ;
-              celdaGenero.setBackground(colorIncorrecto) ;
-              celdaFamilia.setComment("Error: Esta celda no puede estar vacía si MEXUw tiene valor.") ;
-              celdaGenero.setComment("Error: Esta celda no puede estar vacía si MEXUw tiene valor.") ;
+              celdaFamilia.setBackground(colorIncorrecto).setComment("Error: Esta celda no puede estar vacía si MEXUw tiene valor.") ;
+              celdaGenero.setBackground(colorIncorrecto).setComment("Error: Esta celda no puede estar vacía si MEXUw tiene valor.") ;
           } 
           if(valorGenero != ""){
-              celdaGenero.setBackground(null) ;
-              celdaGenero.setComment(null) ;
+              celdaGenero.setBackground(null).setComment(null) ;
           }
           // Validar que Familia esté en la lista válida
           if (!familiasValidas.includes(valorFamilia)) {
-              celdaFamilia.setBackground(colorIncorrecto) ;
-              celdaFamilia.setComment("Error: Esta familia no está en la lista válida.") ;
+              celdaFamilia.setBackground(colorIncorrecto).setComment("Error: Esta familia no está en la lista válida.") ;
           }
       }else if(valorMEXU != ""){
         celdaMEXU.setBackground(colorIncorrecto) ;
@@ -135,12 +130,10 @@ function onEdit(e) {
     // Verificar si el país está en la lista de países válidos
     if (paisesValidos.includes(valorPais)) {
       // Poner la celda en verde y quitar cualquier comentario
-      rango.setBackground(colorCorrecto) ;
-      rango.setComment('') ;
+      rango.setBackground(colorCorrecto).setComment('') ;
     } else {
       // Poner la celda en rojo y agregar un comentario
-      rango.setBackground(colorIncorrecto) ;
-      rango.setComment('País no válido. Verifique.') ;
+      rango.setBackground(colorIncorrecto).setComment('País no válido. Verifique.') ;
     }
 
      // Poner la celda en blanco si no hay nada escrito
