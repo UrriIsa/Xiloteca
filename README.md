@@ -1,4 +1,4 @@
-# Verificaciones BD Xiloteca (hola 2)
+# Verificaciones BD Xiloteca (hola 3)
 
 Dentro de este repositorio se almacenan los códigos (estático y dinámico) que se realizan en la extensión Apps Script de Google Sheets, los cuales analizan los registros de la Base de Datos.
 Nota : es necesario el acceso a la Base de Datos (BD o DB) ya que desde aquí solo estará el registro de versiones y la administración de cambios. Se recomienda leer el pdf explicativo.
