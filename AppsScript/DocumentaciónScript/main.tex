@@ -1,0 +1,699 @@
+\documentclass[12pt]{article} % Cambia el tamaño de letra y fuente
+\usepackage{graphicx} % Para insertar imágenes
+\graphicspath{ {images/} }
+\usepackage[spanish,es-noshorthands]{babel} % Idioma español
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue]{hyperref} % Índice con enlaces azules
+\usepackage{tocloft} % Personalización del índice
+\usepackage{listings} % Para utilizar formato de código.
+\usepackage{xcolor}
+
+
+\lstdefinelanguage{AppsScript}{
+    language=JavaScript,
+    morekeywords={if, else, var, function, getActiveSheet, getRow, getColumn, source, range, let, const, try, catch}, % Agrega palabras clave específicas de Apps Script
+    keywordstyle=\color{blue}\bfseries,
+    %
+    morekeywords=[2] {Logger}, % Agrega palabras clave específicas de Apps Script
+    keywordstyle=[2] \color{magenta}\bfseries,
+    %
+    comment=[l]{//},    % Comentarios con "//"
+    morecomment=[s]{/*}{*/}, % Comentarios multilínea
+    commentstyle=\color{gray}\ttfamily,
+    stringstyle=\color{red}\ttfamily,
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    frame=single,
+    breaklines=true,
+    showstringspaces=false
+}
+
+
+%FIRMA AUTOGRAFA Y RECOGER EN EL IB
+
+\lstset{
+    language=AppsScript,              % Elige el lenguaje
+    basicstyle=\ttfamily,    % Estilo básico del código
+    keywordstyle=\color{blue}, % Color de las palabras clave
+    stringstyle=\color{red},   % Color para las cadenas
+    commentstyle=\color{gray}, % Color para los comentarios
+    numbers=left,              % Números de línea a la izquierda
+    numberstyle=\tiny,         % Estilo de los números de línea
+    stepnumber=1,              % Numerar cada línea
+    frame=single,              % Añadir un marco alrededor del código
+    breaklines=true,           % Romper líneas largas
+    deletekeywords={graphics},  % Excluir "graphics" como palabra clave
+    showstringspaces=false,      %oculta los espacios literales
+    literate={~}{{\textasciitilde}}1
+             {'}{{\textquotesingle}}1
+             {°}{{\degree}}1
+             {°}{{\textdegree}}1
+             {'}{{'}}1
+             {é}{{\'e}}1
+             {á}{{\'a}}1 
+             {í}{{\'i}}1 
+             {ó}{{\'o}}1 
+             {ú}{{\'u}}1 
+             {ñ}{{\~n}}1 
+             {É}{{\'E}}1 
+             {Á}{{\'A}}1 
+             {Í}{{\'Í}}1 
+             {Ó}{{\'O}}1 
+             {Ú}{{\'Ú}}1 
+             {Ñ}{{\~N}}1
+             {_}{{\textunderscore}}1
+}
+
+
+\newenvironment{indentpar}[1]{%
+    \begin{list}{}%
+        {\setlength{\leftmargin}{#1}}%
+        \item[]%
+    }{\end{list}}
+
+
+%patra hacer las líneas punteadas
+\renewcommand{\cftdotsep}{0.5} % Ajusta la separación entre los puntos
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
+\begin{document}
+
+    \begin{titlepage}
+        \centering
+        {\scshape\LARGE Universidad Nacional Autónoma de México \par}
+    
+        \vspace{0.5cm}
+        {\scshape\Large Xiloteca IB-UNAM\par}
+        \includegraphics[scale=0.07]{imgs/1.logo_mexu.jpg}
+
+        \vspace{2 cm}
+        {\scshape\Large \textbf{Documentación Script-DB} \par}
+
+        \vspace{2.5 cm}
+        {\large {Código realizado en la extensión Apps Script de Google Sheets, con base en JavaScript} \par}
+            
+        \vspace{4 cm}
+
+        {\scshape \large Autor(es) \par} %Cambiará a "Autores" conforme más personas vayan haciendolo
+
+        \begin{center}
+            \begin{itemize}
+                \centering
+                \item Urrutia Alfaro Isaac Arturo 
+            \end{itemize}
+        \end{center}
+
+        
+        \vfill
+    \end{titlepage}
+
+    \newpage
+
+    \hypertarget{toc}{}
+    \tableofcontents {}
+
+
+
+    \newpage
+
+    \section* {Introducción}
+    \addcontentsline{toc}{section}{Introducción}
+    Este documento sirve para explicar dos tipos de códigos desarrollados para analizar la base de datos de la Xiloteca, este código se inicia en un servicio social, se espera que este documento y el código se siga extendiendo y mejorando conforme lleguen más personas a trabajarlo. \\
+
+    El entorno donde se realizó el código código tiene fundamentos en JavaScript, por ello, se recomienda una serie de videos en YouTube titulada \href{https://www.youtube.com/watch?v=FbNuFsP_k5M}{""}. \\
+
+    Se mencionó que se desarrollaron dos códigos distintos, los identificaremos como \textbf{código dinámico} y \textbf{código estático}, esto puesto que el dinámico fue creado para que esté ejecutandose siempre que se actualice algo dentro de los registros de la base de datos, pero, el otro es un código aparte para poder tomarlo, pegar y ejecutar, se hizo así por comodidad de lectura y organización. \\
+    
+    Por otro lado, para poder trabajar con cualquiera de los dos hay que tener una cuenta de \textit{Google} y el acceso al documento que hasta la última actualización\footnote{Porfavor actualizar este nombre si es que cambia posteriormente.} se llama "1. MEXU números enero 2025- nuevo". \\
+
+    Es necesario saber o recordar ciertas cosas, las cuales podrían ayudar a comprender de una mejor manera el código a las personas que tengan nociones muy vagas de programación :
+
+    \subsection* {Consideraciones generales}
+    \addcontentsline{toc}{subsection}{Consideraciones generales}\\
+
+    Una \textbf{variable} es donde se guarda cierta información. El nombre que le damos lo conocemos como identificador. Es necesario es poner la palabra reservada \textcolor{blue}{var} y después el identificador. \\
+
+    El sustento lógico del código son las \textbf{condiciones} o también conocidas \textbf{condicionales}, estas son estructuras que permiten elegir entre ejecutar una acción u otra, dependiendo de si una condición es verdadera o falsa. Sus apalabras reservadas son \textcolor{blue}{if} y \textcolor{blue}{else} : \\
+    \begin{lstlisting} [language=AppsScript]
+    if(condición){
+        // acciones a ejecutar en caso de cumplir la condición
+    }else{
+        // acciones a ejecutar en caso de NO cumplir la condición
+    }    
+    \end{lstlisting} \\
+
+    Podemos meter dentro de los \textcolor{blue}{if} y \textcolor{blue}{else} más condicionales, esto se conoce como condicionales anidadas o \textcolor{blue}{if's} anidados, asimismo, después de un \textit{else} se puede añadir otra verificación : 
+
+    \begin{lstlisting} [language=AppsScript]
+    if(condición){
+        // acciones a ejecutar en caso de cumplir la condición
+        if(){
+            //accciones a ejecutar
+        }
+    }else if(2da condición){
+        // acciones a ejecutar en caso de NO cumplir la primer condición pero SI cumplor la segunda condición
+    }else{
+        // acciones a ejecutar en caso de NO cumplir ni la primera ni segunda condiciones
+    }
+     \end{lstlisting} \\
+     
+    Para concluir con las condiciones es importante denotar que los \textit{else} son opcionales, depende de cómo se piense el flujo de las cosas, sin embargo, no es posible poner un \textit{else} si  haber puesto un \textcolor{blue}{if}. Asimismo, las condición pueden añadir operadores lógicos para hacer más compleja la condición : 
+
+    \begin{itemize}
+        \item  \textit{AND} : se utiliza con \&\& se escribe como :
+            \begin{lstlisting} [language=AppsScript]
+            if(condición1 && condición2)
+            \end{lstlisting} \\
+        \item  \textit{OR} : se utiliza con \textbar\textbar se escribe como " if(condición1 \textbar\textbar condición2) ".
+            \begin{lstlisting} [language=AppsScript]
+            if(condición1 || condición2)
+            \end{lstlisting} \\
+    \end{itemize}
+
+    Si no se sabe de tablas de verdad o lógica, es necesario saber que para el AND se tienen que cumplir todas las condiciones para decir que es verdadero, pero, para el OR, es suficiente que alguna de ellas sea verdad para decir que es verdadero, por otro lado, se pueden añadir más operadores lógicos en una sentencia.
+
+    Por otro lado, hay funciones extras que tenemos en los códigos, lo cual creo q es bueno explicar desde aquí cosas relacionadas a las funciones y las que se repiten en ambos códigos. Un función es una serie de instrucciones específicas que se hacen cuando son llamadas. Tiene la palabra reservada \textcolor{magenta}{function}, luego el nombre de la función, en paréntesis sus parámetros y dentro de las llaves las operaciones, se puede ver como : \\
+    
+    \begin{lstlisting} [language=AppsScript]
+    function nombreFunción(parámetro){
+    //Contenido de operaciones
+    }
+    \end{lstlisting} \\
+
+    Asimismo, se puede ver que hay líneas algo largas en opraciones. Lo anterior es porque podemos hacer más de una operación a una variable en la misma línea.
+
+    Por ejemplo, manipulo a celdaFamilia accediendo a su método (función) \textcolor{blue}{setBackground()} y \textcolor{blue}{setComment()}. \\
+
+    \begin{lstlisting} [language=AppsScript]
+    celdaFamilia.setBackground(color).setComment("Texto");
+    \end{lstlisting} \\
+
+    Esto nos ayuda a poder hacer un poco más corto el código operando de una misma vez la variable que podríamos manipular en dos pasos :\\
+
+    \begin{lstlisting} [language=AppsScript]
+    celdaFamilia.setBackground(color);
+    celdaFamilia.setComment("Texto");
+    \end{lstlisting} \\
+
+    Finalmente hay un operador llamado ternario, el cual toma tres operandos (o argumentos) y se utiliza para evaluar una condición. Si la condición es verdadera, devuelve un valor, y si es falsa, devuelve otro. Es una alternativa concisa a la sentencia \textcolor{blue}{if-else} para tomar decisiones rápidas en una sola línea de código. \\
+
+    Su estructura se ve de la siguiente forma :  \\
+    
+    \begin{lstlisting} [language=AppsScript]
+    condicion ? siVerdadero : siFalso
+    \end{lstlisting} \\
+
+    A comparación del \textcolor{blue}{if-else} en una línea evaluamos la condición y los dos casos si es verdadero o falso, la condición se separa con un \textcolor{magenta}{?} (símbolo de pregunta que cierra) y primero se escribe lo que se hace si es verdadera la condición y después lo que se hace si es falsa la condición, ambas están separadas por \textcolor{magenta}{:} (dos puntos). \\
+
+    El primer ejemplo de su utilización es :
+
+    \begin{lstlisting} [language=AppsScript]
+    celdaLocalidad.setBackground(errorLocalidad ? colorIncorrecto : null) ;
+    \end{lstlisting} \\
+
+    Aquí es es verdadera la variable \textcolor{magenta}{errorLocalidad} (hay un error) se pondrá el fondo de \textcolor{magenta}{colorIncorrecto}, en caso de ser falsa (no hay un error) la variable, su fondo será \textit{null}. Si quisieramos verlo como un \textcolor{blue}{if-else} se vería de la siguiente manera :\\
+
+    \begin{lstlisting} [language=AppsScript]
+    if(errorLocalidad){
+        celdaLocalidad.setBackground(colorIncorrecto) ;
+    }else{
+        celdaLocalidad.setBackground(null) ;
+    }
+    \end{lstlisting} \\
+
+    Como se ve, utilizamos el ternario para elegir el parámetro que se le pasará a la función. Sin embargo y a pesar de que el ternario puede tener más utilidades, en nuestro caso solamente se utiliza en esos casos.
+
+
+
+    
+
+            \begin{flushright}
+                \hyperlink{toc}{\textbf{Volver al índice}}
+            \end{flushright}
+
+
+
+    \newpage
+
+    \section*{Código Dinámico}
+    \addcontentsline{toc}{section}{Código Dinámico}\\
+
+    Este código está en el documento llamado "1. MEXU números enero 2025 nuevo" solamente hay que ir a la sección de extensiones, abrir el apartado de extensiones y picar en \textit{Apps Script}. \\
+
+    Este tipo de código como se puede observar está todo dentro de una sola función, pero se separa por medio de comentarios de una línea y un símbolo especial para poder buscarlos rápidamente. \\
+
+    La función de llama \textcolor{magenta}{onEdit} y tiene como parámetro un evento identificado con la letra \textcolor{blue}{e}. Esto puesto que cada vez que se modifique alguna parte del excell se harán las verificaciones. \\
+    
+    \begin{lstlisting} [language=AppsScript]
+    function onEdit(e)
+    \end{lstlisting}
+
+    Como mencioné el código tiene varias separaciones, por lo que vamos a analizar cada una.
+
+    \subsection*{Generales}
+    \addcontentsline{toc}{subsection}{Generales}\\
+
+    Este apartado como su nombre lo indica es para cosas generales, la mayoría de estas se utilizará a lo largo de todo el código. \\
+
+    Se empieza con una condicional para ver que no haya errores con el evento, si es que existe algún erros entonces manda un mensaje de que algo ocurrió mal y no sigue con lo demás. Esta parte está por si acaso, pero en general jamás debería de aparecer el mensaje.
+    
+
+    \begin{lstlisting} [language=AppsScript]
+    if (!e) {
+        Logger.log('El evento e no se ha pasado correctamente.') ;
+        return ;
+      }
+    \end{lstlisting}
+
+    Ya sabiendo que el evento ocurrió de manera exitosa empiezan las declaraciones de muchas variables. El primer bloque hace referencia a la hoja en la que ocurrió el cambio, el rango, la fila y la columna. La parte de e.source se refiere al documento de Google Sheets donde ocurrió la edición, por lo demás es fácilmente entender qué hacen con los nombres de las funciones.
+    
+    \begin{lstlisting} [language=AppsScript]
+    var hoja = e.source.getActiveSheet() ;
+    var rango = e.range ;
+    var fila = rango.getRow() ;
+    var columnaEditada = rango.getColumn() ;
+    \end{lstlisting}
+
+    Ahora se definen las variables para las columnas de país, municipio, localidad, familia, número MEXU y género, los números son la posición real que tienen dentro de nuestro documento.
+
+    \begin{lstlisting} [language=AppsScript]
+    var columnaPais = 30 ; 
+    var columnaMunicipio = 28 ;
+    var columnaLocalidad = 27 ;
+    var columnaFamilia = 4 ;
+    var columnaMEXU = 12 ;
+    var columnaGenero = 5 ;
+    \end{lstlisting}
+
+    Finalmente se defirieron dos colores, como se puede ver en el nombre existe uno correcto y otro incorrecto, el primero para indicar que todo salió bien y el último para denotar visualmente algún error. A pesar de poder ocupar los colores por defecto que se tienen se buscaron otros mediante hexadecimal.
+
+    \begin{lstlisting} [language=AppsScript]
+    var colorCorrecto = '#B4D3B2' ; // Verde
+    var colorIncorrecto = '#FF0000' ; // Rojo
+    \end{lstlisting}
+
+    Como se pudo observar para cada variable no de tuvo que asignar algún tipo de dato, por lo que es una preocupación menos, sin embargo, hay que estar muy conscientes de la utilidad de cada variable para evitar confusiones.
+    
+
+            \begin{flushright}
+                \hyperlink{toc}{\textbf{Volver al índice}}
+            \end{flushright}
+
+
+    \subsection*{Verificación de familias}
+    \addcontentsline{toc}{subsection}{Verificación de familias}\\
+
+    Creamos una variables que almacene todas las familias válidas que existen, esta parte se recomienda se actualice constantemente con los nombres actualizados de cada familia. Igualmente se recomienda mantener por orden alfabético todos los nombres. La variable es un vector, por lo que sus datos deben de estar dentro de los corchetes y como es texto entre comillas, igualmente, de un dato a otro debe de haber una coma que lo separe.
+
+    \begin{lstlisting} [language=AppsScript]
+    var familiasValidas = ["Acanthaceae", "Achariaceae", ... , "Zosteraceae", "Zygophyllaceae"] ;
+    \end{lstlisting}  \\
+
+    Posteriormente se hace la verificación de las familias, cambia los colores de las celdas y añade comentarios, en caso de ser celdas vacias entonces, todo eso con el siguiente código : \\
+    
+    \begin{lstlisting} [language=AppsScript]
+    var celdaFamilia = hoja.getRange(fila, columnaFamilia);
+    
+    if (columnaEditada === columnaFamilia) {
+        var valorFamilia = rango.getValue();
+        var famVerdad = familiasValidas.includes(valorFamilia);
+        
+        celdaFamilia.setBackground(famVerdad ? colorCorrecto : colorIncorrecto)
+                    .setComment(famVerdad ? null : "Error : esta familia no está en la lista válida.");
+    
+        if(valorFamilia === ""){
+            celdaFamilia.setBackground(null);
+            rango.setComment(null);
+        }
+    }
+    \end{lstlisting}
+
+    En el primer paso, el código identifica la celda específica en la que se ha realizado la edición dentro de la columna familia. Esto se hace utilizando el método \textcolor{blue}{getRange(fila, columnaFamilia)}, lo que permite seleccionar la celda correspondiente en la hoja de cálculo. \\
+    
+    Luego, se verifica si la columna editada es precisamente la que corresponde a familia. Si esta condición se cumple, se procede a obtener el valor almacenado en la celda a través de \textcolor{blue}{rango.getValue()}. Este valor ingresado por el usuario es comparado con una lista de familias válidas contenida en la variable \textcolor{magenta}{familiasValidas}. Para realizar esta verificación, se usa el método \textcolor{blue}{includes()}, que determina si el valor de la celda está presente en la lista de valores permitidos. \\
+    
+    Si el valor se encuentra en la lista, la variable \textcolor{magenta}{famVerdad} se establece en true, indicando que el valor es válido; de lo contrario, \textcolor{magenta}{famVerdad} será false, señalando que el valor ingresado no está permitido. \\
+
+    Después de determinar si el valor es válido o no, el código cambia el formato de la celda de acuerdo con la verificación realizada. Si \textcolor{magenta}{famVerdad} es true, el fondo de la celda se establece en \textcolor{magenta}{colorCorrecto}, lo que visualmente indica que el valor ingresado es válido. \\
+    
+    Además, el comentario de la celda se elimina (null) para que no haya mensajes de error visibles. En cambio, si \textcolor{magenta}{famVerdad} es false, la celda cambia su fondo a \textcolor{magenta}{colorIncorrecto} y se añade un comentario que informa al usuario que la familia ingresada no está en la lista válida. Este comentario le ofrece una advertencia para corregir su entrada y garantizar que los datos sean consistentes con los requisitos establecidos.  \\
+    
+    Finalmente, el código maneja el caso en el que la celda está vacía. Si el valor ingresado en \textcolor{magenta}{valorFamilia} es una cadena vacía (""), se restablece la celda eliminando su color de fondo y su comentario asociado. Esto asegura que una celda vacía no conserve un formato incorrecto ni un mensaje de error innecesario. Con esta última verificación, el código mantiene la limpieza y la coherencia visual dentro de la hoja de cálculo.
+    
+        
+
+
+            \begin{flushright}
+                \hyperlink{toc}{\textbf{Volver al índice}}
+            \end{flushright}
+
+
+    \subsection*{Verificación en base al MEXU}
+    \addcontentsline{toc}{subsection}{Verificación en base al MEXU}\\
+
+
+    Primero, el código identifica las celdas correspondientes a MEXU y Género mediante \textcolor{blue}{getRange()}, posteriormente, recupera los valores almacenados en estas celdas usando \textcolor{blue}{getValue()}.  \\
+    
+    Luego, se verifica si la columna editada es alguna de Familia, MEXU o Género, asegurando que solo se aplique la validación en estas áreas relevantes de la hoja. Si la celda MEXU está vacía, la función \textcolor{magenta}{limpiarCelda()} es invocada para eliminar cualquier formato visual o comentario en las celdas MEXU y Género, asegurando que no haya marcadores innecesarios en datos no ingresados. 
+
+    \begin{lstlisting} [language=AppsScript]
+  var celdaMEXU = hoja.getRange(fila, columnaMEXU) ;
+  var celdaGenero = hoja.getRange(fila, columnaGenero) ;
+
+  var valorMEXU = celdaMEXU.getValue();
+  var valorGenero = celdaGenero.getValue();
+
+  if (columnaEditada === columnaFamilia || columnaEditada === columnaMEXU || columnaEditada === columnaGenero) {
+    if(valorMEXU === ""){
+      limpiarCelda(celdaMEXU) ;
+      limpiarCelda(celdaGenero) ;
+    }
+
+    \end{lstlisting}
+    A continuación, se revisa si el valor de MEXU contiene la cadena "MEXUw", lo cual indica una condición especial que requiere verificación adicional. En este caso, si Familia o Género están vacíos, las respectivas celdas se resaltan con \textcolor{magenta}{colorIncorrecto} y se les asigna un comentario informativo, advirtiendo al usuario que no pueden quedar vacías si "MEXUw" está presente en MEXU. \\
+    
+    Si Género contiene un valor, entonces las celdas Género y Familia se limpian, eliminando cualquier formato de error previo. Además, si Familia es una cadena vacía, su fondo se restablece y se elimina cualquier comentario asociado.
+
+    \begin{lstlisting} [language=AppsScript]
+    if (valorMEXU.includes("MEXUw")) {
+    
+      if (valorFamilia === "" || valorGenero === "") {
+        celdaFamilia.setBackground(colorIncorrecto).setComment("Error: Esta celda no puede estar vacía si MEXUw tiene valor.") ;
+        celdaGenero.setBackground(colorIncorrecto).setComment("Error: Esta celda no puede estar vacía si MEXUw tiene valor.") ;
+      } 
+      if(valorGenero != ""){
+        limpiarCelda(celdaGenero) ;
+        limpiarCelda(celdaFamilia) ;
+      }
+      if(valorFamilia === ""){
+        celdaFamilia.setBackground(null) ;
+        rango.setComment(null) ;
+      }
+    }else if(valorMEXU != ""){
+      celdaMEXU.setBackground(colorIncorrecto) ;
+      celda.setComment("Checa lo que escribiste.") ; 
+    }
+      \end{lstlisting}
+    
+    Finalmente, si MEXU contiene un valor distinto de vacío pero que no cumple con la condición de "MEXUw", se aplica un fondo de error a la celda MEXU y se agrega un comentario que indica al usuario que revise el contenido ingresado. Esto garantiza que los datos sean consistentes y que cualquier entrada incorrecta sea marcada de manera clara para su corrección.
+
+        
+
+
+            \begin{flushright}
+                \hyperlink{toc}{\textbf{Volver al índice}}
+            \end{flushright}
+
+
+    
+
+    \subsection*{Verificación de escritura de Países}
+    \addcontentsline{toc}{subsection}{Verificación de escritura de Países}\\
+    
+
+    En la primera parte del código, se declara un arreglo de países válidos bajo el nombre \textcolor{magenta}{paisesValidos} :
+
+    \begin{lstlisting} [language=AppsScript]
+      var paisesValidos = [
+        "América Central",..., "Venezuela", "Zaire"
+      ] ;
+    \end{lstlisting} 
+    
+    La validación dependerá de si el nombre ingresado en la celda se encuentra dentro de este conjunto. Si el país ingresado coincide con uno de los elementos dentro del arreglo, se considera válido; en caso contrario, se aplicará una advertencia visual para señalar el error. \\
+
+    
+
+    A continuación, el código ejecuta una verificación dentro de un bloque condicional \textit{if}, comprobando si la columna editada corresponde a la variable \textcolor{magenta}{columnaPais}. \\
+    
+    Esta validación es crucial para evitar que el código modifique otras columnas innecesariamente. Si el usuario ha editado una celda dentro de la columna de país, el código procede a obtener el valor con \textcolor{blue}{rango.getValue()}. \\
+    
+    Posteriormente, se usa el método \textcolor{blue}{includes()} para determinar si el valor pertenece a la lista de \textcolor{magenta}{paisesValidos}. Si el resultado es positivo, la celda se colorea con \textcolor{magenta}{colorCorrecto}, indicando que el país ingresado es válido. Si el valor no está en la lista, la celda recibe un fondo con \textcolor{magenta}{colorIncorrecto}, señalando visualmente que hay un error. \\
+    
+    Además, en este último caso, se añade un comentario en la celda con el mensaje "País no válido. Verifique.", proporcionando al usuario una indicación clara de que su entrada no coincide con los valores esperados.
+
+    \begin{lstlisting} [language=AppsScript]
+    if (rango.getColumn() == columnaPais) {
+        var valorPais = rango.getValue() ;
+    
+        rango.setBackground(paisesValidos.includes(valorPais) ? colorCorrecto : colorIncorrecto).setComment(paisesValidos.includes(valorPais) ? null : "País no válido. Verifique.") ;
+
+        // última sentencia if para valor
+    }
+    \end{lstlisting}
+    
+    Por último, el código maneja el caso en el que la celda queda vacía después de la edición. Si \textcolor{magenta}{valorPais} es una cadena vacía (""), se ejecutan dos acciones: primero, se restablece el color de la celda a null, eliminando cualquier marca de error previa; segundo, se borra cualquier comentario existente para evitar confusión en futuras ediciones. \\
+    
+    Esto garantiza que una celda vacía no permanezca resaltada con un color incorrecto ni muestre advertencias innecesarias. \\ \\ \\
+
+    \begin{lstlisting} [language=AppsScript]
+        if (valorPais === '') {
+            rango.setBackground(null) ; 
+            rango.setComment('') ;
+        }
+    
+    \end{lstlisting}
+
+
+
+
+
+            \begin{flushright}
+                \hyperlink{toc}{\textbf{Volver al índice}}
+            \end{flushright}
+
+
+    
+
+    \subsection*{Verificación de Estado en Localidad y Municipio}
+    \addcontentsline{toc}{subsection}{Verificación de Estado en Localidad y Municipio}\\
+
+    El primer paso del código es la declaración de \textcolor{magenta}{estadosMexico}, un arreglo que contiene los nombres de todos los estados de México. Esta lista es utilizada más adelante para comprobar si los valores ingresados en las celdas de Localidad y Municipio corresponden a estados válidos. \\
+     
+    \begin{lstlisting} [language=AppsScript]
+     var estadosMexico = [
+        "Aguascalientes", "Baja California", ... , "Yucatán", "Zacatecas"
+     ] ;
+    \end{lstlisting}
+
+    Se procede a recuperar el contenido actual de estas celdas con \textcolor{blue}{getValue()}, almacenando los valores de Localidad, Municipio y País en variables para realizar las verificaciones necesarias. \\
+    
+    Luego, se ejecuta una condición \textcolor{blue}{if} para determinar si la edición ocurrió en alguna de estas tres columnas (País, Localidad o Municipio). Esto evita que la validación se ejecute cuando se editan otras partes de la hoja de cálculo, asegurando que solo se revise lo esencial. \\
+    
+    \begin{lstlisting} [language=AppsScript]
+      var celdaPais = hoja.getRange(fila, columnaPais) ;
+      var celdaLocalidad = hoja.getRange(fila, columnaLocalidad) ;
+      var celdaMunicipio = hoja.getRange(fila, columnaMunicipio) ;
+    
+      var valorLocalidad = celdaLocalidad.getValue() ;
+      var valorMunicipio = celdaMunicipio.getValue() ;
+      var valorPais = celdaPais.getValue() ;
+    \end{lstlisting}
+
+    Si el país ingresado es "México", el código procede a verificar si Localidad y Municipio pertenecen a la lista de \textcolor{magenta}{estadosMexico}. Se usa el método \textcolor{blue}{includes()} para comprobar si los valores de Localidad y Municipio existen dentro del arreglo.  \\
+    
+    Si uno de ellos está en la lista, se interpreta como un error, ya que un estado de México no debería estar escrito en la columna Localidad o Municipio, sino únicamente en País. Como resultado de esta validación, se aplica un fondo de error (\textcolor{magenta}{colorIncorrecto}) a la celda correspondiente, marcándola visualmente para que el usuario pueda corregir el problema.  \\
+    
+
+    \begin{lstlisting} [language=AppsScript]
+      if (columnaEditada === columnaPais || columnaEditada === columnaLocalidad || columnaEditada === columnaMunicipio) {
+
+        if (valorPais === "México") {
+          var errorLocalidad = estadosMexico.includes(valorLocalidad) ;
+          var errorMunicipio = estadosMexico.includes(valorMunicipio) ;
+    
+          celdaLocalidad.setBackground(errorLocalidad ? colorIncorrecto : null) ;
+          celdaMunicipio.setBackground(errorMunicipio ? colorIncorrecto : null) ;
+          
+        } else {
+          celdaLocalidad.setBackground(null) ;
+          celdaMunicipio.setBackground(null) ;
+        }
+      }
+      \end{lstlisting}
+    
+    En caso de que el país ingresado no sea "México", el código asegura que los formatos de las celdas Localidad y Municipio se restablezcan a su estado original. Se usa \textcolor{blue}{setBackground(null)} para eliminar cualquier marca de error que haya quedado previamente, asegurando que los cambios de color solo se apliquen cuando sean realmente necesarios.
+
+
+            \begin{flushright}
+                \hyperlink{toc}{\textbf{Volver al índice}}
+            \end{flushright}
+
+
+
+    
+    \subsection*{Verificación de fechas}
+    \addcontentsline{toc}{subsection}{Verificación de fechas}\\
+
+    Iniciamos obtienen el rango de las filas de la \textcolor{magenta}{columnaDias} y \textcolor{magenta}{columnaMeses}, para guardarlos en celdaDias y celdaMeses respectivamente. \\
+
+    \begin{lstlisting} [language=AppsScript]
+    var celdaDias = hoja.getRange(fila, columnaDias);
+    var celdaMeses = hoja.getRange(fila, columnaMeses);
+    \end{lstlisting}
+
+    Luego, si la columna editada es la de \textcolor{magenta}{columnaDias} o \textcolor{magenta}{columnaMeses} obtengo el valor de los datos con \textcolor{blue}{getValue()} e inicio las variables diasValidos y mesesValidos para saber si podemos seguir.  \\
+
+    \begin{lstlisting} [language=AppsScript]
+    if (columnaEditada == columnaDias || columnaEditada == columnaMeses) {
+      var dias = celdaDias.getValue();
+      var meses = celdaMeses.getValue();
+    
+      var diasValidos = true;
+      var mesesValidos = true;
+
+      \end{lstlisting}
+
+    Primero hago una verificación para ver si es que los datos que se introdujeron para días y meses son válidos en general, esto lo hago checando si \textcolor{magenta}{dias} no es menor que 1 (osea, 0 o negativos) ó que sea mayor que 31. Asimismo, verifico que \textcolor{magenta}{meses} no es menor que 1 (osea, 0 o negativos) ó que sea mayor que 12. En ambos casos si algunas de las condiciones se cumple (que tenga un número invalido) marcará la respectiva celda con \textcolor{magenta}{colorIncorrecto}, un mensaje y deja el valor en \textit{false} para no poder continuar
+      
+    \begin{lstlisting} [language=AppsScript]
+      if (dias < 1 || dias > 31) {
+        celdaDias.setBackground(colorIncorrecto).setComment("ES UN NUMERO DE DIA INVALIDO");
+        diasValidos = false;
+      }
+      
+      if (meses < 1 || meses > 12) {
+        celdaMeses.setBackground(colorIncorrecto).setComment("ES UN NUMERO DE DIA INVALIDO");
+        mesesValidos = false;
+      }
+    \end{lstlisting}
+
+    Primero verifica que sean válidos los meses y días, en caso de que sí primero crea un vector \textcolor{magenta}{diasEnMes} que guarda en orden los respectivos días que pueden tener los meses (el caso de Febrero es específico y se omitió). Con ello hago una verificación para ver si el día ingresado puede tener en el mes que le corresponde, en caso de que no se oueda marcará la celda de otro color y añadira un mensaje; ahora, en caso de que si sea válido se limpiará la celda si es que tenía algún color.
+
+    \begin{lstlisting} [language=AppsScript]
+      if (diasValidos && mesesValidos) {
+        var diasEnMes = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (dias > diasEnMes[meses - 1]) {
+          celdaDias.setBackground(colorIncorrecto).setComment("Ese número de días no puede estar en ese mes.");
+        } else {
+          limpiarCelda(celdaDias) ;
+          limpiarCelda(celdaMeses) ;
+        }
+      }
+    \end{lstlisting}
+
+    Finalmente, por unos errores que se presentaron en el flujo del código respecto a las demás verificaciones se añadieron estas últimas condicionales que solo limpian las celdas en caso de que se haya borrado su contenido o este sea vacío o cuando tenemos los valores de NA.
+    
+    \begin{lstlisting} [language=AppsScript]
+      if (dias === "" || dias === null || dias === "NA") {
+        limpiarCelda(celdaDias) ;
+      }
+
+      if (meses === "" || meses === null || meses === "NA") {
+        limpiarCelda(celdaMeses) ;
+      }
+    }
+    \end{lstlisting}
+    
+
+            \begin{flushright}
+                \hyperlink{toc}{\textbf{Volver al índice}}
+            \end{flushright}
+
+
+        
+
+    \newpage
+
+    \section*{Código Estático}
+    \addcontentsline{toc}{section}{Código Estático}\\
+
+    Este código no fue realizado en la misma hoja de cálculo en donde se realizó el otro, sin embargo, se copió una parte más pequeña del original, por lo que no varían. Se implementó de esta manera ya que primero se realizó el Dinámico, como ya estaba en funcionamiento se prefirió crearlo aparte para no interferir. \\
+
+    Las diferencias de las condicionales no son muchas, solamente cambia el flujo e iteraciones. Como se consideró que son muy parecidos todo lo que cambia está en el apartado de Consideraciones generales, que es el siguiente. \\
+
+
+    
+    \subsection*{Consideraciones generales}
+    \addcontentsline{toc}{subsection}{Consideraciones generales}\\
+
+    Primero vamos a obtener la hoja de una manera diferente, en la variable \textcolor{magenta}{hoja} obtenemos la hoja actual, sin embargo, como se muestra en el código, tenemos primero \textcolor{magenta}{SpreadsheetApp}, que es un objeto global en Google Apps Script que permite acceder y manipular hojas de cálculo; luego \textcolor{blue}{getActiveSpreadsheet()}, que devuelve el archivo de hoja de cálculo en el que se está ejecutando el script y finalmente \textcolor{blue}{getActiveSheet()}, que toma la hoja de trabajo actual.
+
+    \begin{lstlisting} [language=AppsScript]
+    SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    \end{lstlisting} \\
+
+    Después tenemos la declaración de constantes referentes a las columnas que se utilizarán, los colores y una que es referente a la última fila, esta se crea porque necesitamos saber donde terminan los datos por la manera de verificar la hoja de cálculo.
+    
+    La mayor diferencia que tiene \textcolor{blue}{var} y \textcolor{blue}{const} es que la \textcolor{blue}{var} es solo de alcance funcional y puede reasignar su valor, pero la \textcolor{blue}{const} tiene un alcance de bloque y no se puede reasignar su valor. \\
+
+    Este código está organizado por funciones, ya que al ser estático me pareció más fácil hacerlo de esta manera. Por ello, la primera función que aparece es \textcolor{blue}{main}, la cual sirve para llamar a todas las funciones auxiliares que harán las verificaciones. \\
+
+    Aparecerán cuadros de dialogo que te expliquen las cosas, uno al inicio para indicar que se inició y otro al final dependiendo de si se pudieron realizar todas las acciones o si hubo algún error. \\
+
+    Los cuadros de gialogo se escriben de la siguiente manera : 
+
+    \begin{lstlisting} [language=AppsScript]
+    SpreadsheetApp.getUi().alert("Se inician las validaciones, por favor espere al siguiente mensaje.");
+    \end{lstlisting} \\
+
+    Con \textcolor{magenta}{SpreadsheetApp} accedemos a la interfaz gráfica del usuario \textcolor{blue}{getUi()} y creamos el cuadro de dialogo con \textcolor{blue}{alert("")}, dentro, el mensaje que queremos poner.
+
+    El bloque o la estructura \textcolor{blue}{try-catch} es para poder intentar acciones pero que si existe un error el alguna en vez de que truene el código, hagamos otra cosa en su lugar. Para nuestro caso el \textcolor{blue}{try} (intentar) es para llamar a todas las funciones y realicen lo que les corresponde, luego, si en alguna hay algún error con alguna celda o algo de cachará (\textcolor{blue}{catch}) el error y en un cuadro de dialogo se explicará qué pasó.\\
+
+    Estructura del bloque try catch :
+
+    \begin{lstlisting} [language=AppsScript]
+    try{
+    // Acciones que se intentarán, pero que pueden generar excepciones o errores.
+    }catch(error){
+    // Acción (mayormente imprimir mensajes) en caso de que ocurra algún error.
+    }
+    \end{lstlisting} \\
+
+
+    Ahora, solamente vamos a explicar uno de los ejemplos más extensos que es el de la verificación de las familias. Con eso es suficiente para poder comprender la funcionalidad de las demás funciones.
+    
+    
+
+
+    \begin{flushright}
+        \hyperlink{toc}{\textbf{Volver al índice}}
+    \end{flushright}
+
+
+
+
+    \subsection*{Función validarFamilias}
+    \addcontentsline{toc}{subsection}{Función validarFamilias}\\
+
+    Después de obtener en la constante \textcolor{magenta}{datos} los valores del rango de \textcolor{magenta}{columnaFamilia} y crear el véctor familiasValidas, procedemos a entrar a un bloque \textcolor{blue}{forEach}, este es como un \textcolor{blue}{for}, pero en el parámetro ya le indicamos la variable que representará cada dato en cada iteración.\\
+    
+    El método \textcolor{blue}{forEach} recorre cada elemento del arreglo \textcolor{magenta}{datos}. En cada iteración, \textcolor{magenta}{fila} representa la fila actual y \textcolor{magenta}{i} es el índice de dicha fila.\\
+
+    Se extrae el primer elemento de la fila. Se convierte a cadena de texto para evitar errores y, posteriormente, se normaliza para tener la primera letra en mayúscula y el resto en minúscula. Esto es útil para comparar de forma estándar entre datos ingresados.\\
+
+    \begin{lstlisting} [language=AppsScript]
+    let familia = String(fila[0]);
+    const familiaNormalizada = familia.charAt(0).toUpperCase() + familia.slice(1).toLowerCase();
+    \end{lstlisting} \\
+
+    Luego, se obtiene la celda correspondiente usando \textcolor{blue}{hoja.getRange}. Se suma 2 al índice \textcolor{magenta}{i} porque la fila 1 es un encabezado y el array \textcolor{magenta}{datos} empieza desde la fila 0. La variable \textcolor{magenta}{columnaFamilia} da la columna donde se debe poner la validación.\\
+    
+    \begin{lstlisting} [language=AppsScript]
+    let casillaFamilia = hoja.getRange(i + 2, columnaFamilia);
+    \end{lstlisting} \\
+
+    Antes de realizar cualquier validación, se comprueba si \textcolor{magenta}{familia} es vacía. Si es así, se llama a una función \textcolor{magenta}{limpiarCelda} para limpiar o resetear la celda y se termina la ejecución de la función de \textit{callback} para esa iteración usando \textcolor{blue}{return}.
+
+    \begin{lstlisting} [language=AppsScript]
+    if (!familia){
+      limpiarCelda(casillaFamilia);
+      return;
+    }
+    \end{lstlisting} \\
+   
+    Finalmente, vienen las comparaciones para hacer validaciones. Si la cadena normalizada se encuentra dentro del arreglo \textcolor{magenta}{familiasValidas}, se actualiza el fondo de la celda con \textcolor{magenta}{colorCorrecto} y se elimina cualquier comentario previo. \\
+
+    Si la familia no se encuentra, se pinta la celda con \textcolor{magenta}{colorIncorrecto} (posiblemente rojo) para alertar visualmente el error.\\
+
+     Luego, se generan sugerencias filtrando \textcolor{magenta}{familiasValidas} para aquellas que tengan el mismo inicio que las primeras tres letras (esto ayuda a identificar errores tipográficos o variaciones comunes). Se crea un mensaje de sugerencias que se establece como comentario en la celda. Si no hay sugerencias, se informa que no se encontró ninguna.
+
+
+
+     
+
+    \begin{flushright}
+        \hyperlink{toc}{\textbf{Volver al índice}}
+    \end{flushright}
+
+\end{document}
