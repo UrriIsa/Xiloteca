@@ -1,21 +1,52 @@
+/*---------------------------------------------------------- *** DECLARACIÓN DE VARIABLES GLOBALES *** ------------------------------------------- */
 
+const hoja = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+const columnaFamilia = 4; 
+const columnaGenero = 5 ;
+const columnaMEXU = 12 ;
+const columnaLocalidad = 27; 
+const columnaMunicipio = 28;  
+const columnaEstado = 29; 
+const columnaPaises = 30; 
+const columnaDias = 32;       
+const columnaMeses = 33;   
+
+
+const colorCorrecto = '#B4D3B2'; // Verde
+const colorIncorrecto = '#FF0000'; // Rojo
+
+const ultimaFila = hoja.getLastRow() - 1;
+
+/* ------------------------------------------------------------ %%% FUNCIÓN PRINCIPAL %%% ------------------------------------------------------ */
+
+/**
+ * Función principal que llama a las demás para crear hacer las verificaciones.
+ * Utiliza un bloque try-catch para mejorar la robustez y añade alertas que indican lo sucedido.
+ */
 function main() {
-    // Llamada a la función de validación de países
-  validarFamilias(); // Llamada a la función de validación de familias
-  validarPaises();
-  SpreadsheetApp.getUi().alert("Validación completa de Familia y Países. Revisa las celdas resaltadas.");
+  try {
+    SpreadsheetApp.getUi().alert("Se inician las validaciones, por favor espere al siguiente mensaje.");
+    
+    validarFamilias();
+    validarPaises();
+    validarLocalidadMunicipio();
+    validarFechas();
+    validarDatosMEXU()
+
+    SpreadsheetApp.getUi().alert("Validación completa de Familias, Países, Localidades, Municipios, Fechas y Números MEXU. Revisa las celdas resaltadas.");
+  } catch (error) {
+    SpreadsheetApp.getUi().alert(`Error en la validación: ${error.message}`);
+  }
 }
 
-function validarFamilias (){
-  
-  const hoja = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var columnaFamilia = 4; // Corregido: Usar columnaFamilia en lugar de columnaPais
-  const rango = hoja.getRange(2, columnaFamilia, hoja.getLastRow() - 1); // Rango correcto
-  const datos = rango.getValues();
+/*------------------------------------------------------------- !!! VERIFICACION DE FAMILIAS  !!! ----------------------------------*/
 
-  // Definir colores
-  var colorCorrecto = '#B4D3B2'; // Verde
-  var colorIncorrecto = '#FF0000'; // Rojo
+/**
+ * Función para verificar las familias válidas respecto a una lista que ya está verificada.
+ */
+function validarFamilias (){
+  const datos = hoja.getRange(2, columnaFamilia, ultimaFila).getValues();
 
 //IGUALMENTE FALTAN VERIFICAR BIEN LAS FAMILIAS, TENGO ESPECIES Y GENEROS DENTRO DE ESTA LISTA.
   const familiasValidas = [
@@ -24,18 +55,15 @@ function validarFamilias (){
 
 //Ciclo para 
 datos.forEach((fila, i) => {
-    let familia = String(fila[0]).trim(); // Asegurar que es String y eliminar espacios
-
-    // Normalizar formato
+    let familia = String(fila[0]); // Asegurar que es String y eliminar espacios
     const familiaNormalizada = familia.charAt(0).toUpperCase() + familia.slice(1).toLowerCase();
-
+    
     let casillaFamilia = hoja.getRange(i + 2, columnaFamilia) ;
 
     if (!familia){
-      casillaFamilia.setBackground(null).setComment(null);
+      limpiarCelda(casillaFamilia) ; 
       return ;
     } // Si la celda está vacía, saltar la fila
-
 
     if (familiasValidas.includes(familiaNormalizada)) {
       // Si la familia es válida, pintar en verde y eliminar comentario si existe
@@ -56,11 +84,12 @@ datos.forEach((fila, i) => {
 
 }
 
+/*----------------------------------------------------- ### VERIFICACIÓN DE LOS PAÍSES BIEN ESCRITOS ### -------------------------------------*/
 
+/**
+ * Función para verificar los países válidos respecto a una lista de países.
+ */
 function validarPaises() {
-  const hoja = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-
-  const columnaPaises = 30; 
   const rango = hoja.getRange(2, columnaPaises, hoja.getLastRow() - 1); 
   const datos = rango.getValues();
 
@@ -77,7 +106,7 @@ function validarPaises() {
 
   // Validar los datos
   datos.forEach((fila, i) => {
-    let pais = String(fila[0]).trim(); // Asegurar que es String y eliminar espacios
+    let pais = String(fila[0]); // Asegurar que es String y eliminar espacios
 
     // Normalizar formato
     const paisNormalizado = pais.charAt(0).toUpperCase() + pais.slice(1).toLowerCase();
@@ -85,7 +114,7 @@ function validarPaises() {
     let casillaPais = hoja.getRange(i + 2, columnaPaises) ; 
 
     if(!pais){
-      casillaPais.setBackground(null).setComment(null);
+      limpiarCelda(casillaPais) ;
       return ; 
     }
 
@@ -102,7 +131,180 @@ function validarPaises() {
       // Agregar comentario con la sugerencia
       casillaPais.setBackground("red").setComment(`Sugerencias: ${sugerenciaTexto}`);
     }
+    
   });
 
 }
 
+/*------------------------------------------ ^^^ VERIFICACION DE MÉXICO Y SUS LOCALIDADES Y MUNICIPIOS ^^^ ----------------------------------*/
+
+/**
+ * Función para verificar la localidad y municipio para que no sean ningún estado del país.
+ */
+function validarLocalidadMunicipio() {
+
+  const estadosMexico = [
+    "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua",
+    "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México", "Guanajuato",
+    "Guerrero", "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit", "Nuevo León",
+    "Oaxaca", "Puebla", "Querétaro", "Quintana Roo", "San Luis Potosí", "Sinaloa",
+    "Sonora", "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
+  ];
+
+  const ultimaFila = hoja.getLastRow() - 1;
+
+  const rangoPais = hoja.getRange(2, columnaPaises, ultimaFila);
+  const rangoLocalidad = hoja.getRange(2, columnaLocalidad, ultimaFila);
+  const rangoMunicipio = hoja.getRange(2, columnaMunicipio, ultimaFila);
+  const rangoEstado = hoja.getRange(2, columnaEstado, ultimaFila);
+
+  const valoresPais = rangoPais.getValues();
+  const valoresLocalidad = rangoLocalidad.getValues();
+  const valoresMunicipio = rangoMunicipio.getValues();
+  const valoresEstado = rangoEstado.getValues();
+
+
+  for (let i = 0; i < ultimaFila; i++) {
+    const pais = String(valoresPais[i][0]).trim();
+    const localidad = String(valoresLocalidad[i][0]).trim();
+    const municipio = String(valoresMunicipio[i][0]).trim();
+
+    //const estado = String(valoresEstado[i][0]).trim();
+    // se añadiria !estadosMexico.includes(estado) si es que si hay un estado deje tener el mismo nombre
+
+    const celdaLocalidad = hoja.getRange(i + 2, columnaLocalidad);
+    const celdaMunicipio = hoja.getRange(i + 2, columnaMunicipio);
+
+    if (pais === "México") {
+      const localidadEsEstado = estadosMexico.includes(localidad);
+      const municipioEsEstado = estadosMexico.includes(municipio);
+
+      celdaLocalidad.setBackground(localidadEsEstado ? colorIncorrecto : null) ;
+      celdaMunicipio.setBackground(municipioEsEstado ? colorIncorrecto : null) ;
+
+    } else {
+      // Restaurar colores si el país no es México
+      celdaLocalidad.setBackground(null);
+      celdaMunicipio.setBackground(null);
+    }
+  }
+}
+
+/*----------------------------------------------------- @@@ VERIFICACIÓN DE FECHAS @@@ -------------------------------------*/
+
+/**
+ * Función para verificar las fechas que pueden ser posibles respecto al mes. No se toman en cuentan los años bisiestos.
+ */
+function validarFechas() {
+
+  const rangoDias = hoja.getRange(2, columnaDias, ultimaFila);
+  const rangoMeses = hoja.getRange(2, columnaMeses, ultimaFila);
+
+  const valoresDias = rangoDias.getValues();
+  const valoresMeses = rangoMeses.getValues();
+
+  const colorIncorrecto = "#FFCCCC"; // Color de fondo para errores
+
+  const diasEnMes = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+  for (let i = 0; i < ultimaFila; i++) {
+    let dias = valoresDias[i][0];
+    let meses = valoresMeses[i][0];
+
+    let celdaDias = hoja.getRange(i + 2, columnaDias);
+    let celdaMeses = hoja.getRange(i + 2, columnaMeses);
+
+    let diasValidos = true;
+    let mesesValidos = true;
+
+    // Validar día básico
+    if (dias < 1 || dias > 31) {
+      celdaDias.setBackground(colorIncorrecto).setComment("ES UN NÚMERO DE DÍA INVÁLIDO");
+      diasValidos = false;
+    } else {
+      limpiarCelda(celdaDias) ;
+    }
+
+    // Validar mes
+    if (meses < 1 || meses > 12) {
+      celdaMeses.setBackground(colorIncorrecto).setComment("ES UN NÚMERO DE MES INVÁLIDO");
+      mesesValidos = false;
+    } else {
+      limpiarCelda(celdaMeses) ;
+    }
+
+    // Validar combinación días/mes si ambos son válidos
+    if (diasValidos && mesesValidos) {
+      if (dias > diasEnMes[meses - 1]) {
+        celdaDias.setBackground(colorIncorrecto).setComment("Ese número de días no puede estar en ese mes.");
+      } else {
+        limpiarCelda(celdaMeses) ;
+        limpiarCelda(celdaDias) ;
+      }
+      
+    }
+
+    // Limpiar si celda de días está vacía
+    if (dias === "" || dias === null || dias === "NA") {
+      limpiarCelda(celdaDias) ;
+      
+    }
+
+    // Limpiar si celda de meses está vacía
+    if (meses === "" || meses === null || meses === "NA") {
+      limpiarCelda(celdaMeses) ;
+    }
+  }
+}
+
+/*----------------------------------------------------------- ___ VERIFICACION EN BASE A MEXU ___ -----------------------------------------------*/
+
+/**
+ * Función para verificar que ni la familia ni el género estén vacíos si ya hay algún número MEXUw.
+ */
+function validarDatosMEXU() {
+
+  const rangoMEXU = hoja.getRange(2, columnaMEXU, ultimaFila);
+  const rangoGenero = hoja.getRange(2, columnaGenero, ultimaFila);
+  const rangoFamilia = hoja.getRange(2, columnaFamilia, ultimaFila);
+
+  const valoresMEXU = rangoMEXU.getValues();
+  const valoresGenero = rangoGenero.getValues();
+  const valoresFamilia = rangoFamilia.getValues();
+
+  for (let i = 0; i < ultimaFila; i++) {
+    const valorMEXU = String(valoresMEXU[i][0]).trim();
+    const valorGenero = String(valoresGenero[i][0]).trim();
+    const valorFamilia = String(valoresFamilia[i][0]).trim();
+
+    const celdaMEXU = hoja.getRange(i + 2, columnaMEXU);
+    const celdaGenero = hoja.getRange(i + 2, columnaGenero);
+    const celdaFamilia = hoja.getRange(i + 2, columnaFamilia);
+
+
+    // Validar contenido de MEXU
+    if (valorMEXU.includes("MEXUw")) {
+      validarCeldaObligatoria(valorFamilia, celdaFamilia, "Error: Esta celda no puede estar vacía si MEXUw tiene valor.");
+      validarCeldaObligatoria(valorGenero, celdaGenero, "Error: Esta celda no puede estar vacía si MEXUw tiene valor.");
+
+      if (valorGenero !== "") {
+        limpiarCelda(celdaGenero);
+      }
+
+    } else {
+      celdaMEXU.setBackground(colorIncorrecto).setComment("Esta celda no puede ser vacía");
+    }
+  }
+}
+
+// Función para limpiar una celda
+function limpiarCelda(celda) {
+  celda.setBackground(null).setComment(null);
+}
+
+// Función para validar si una celda debe tener un valor
+function validarCeldaObligatoria(valor, celda, mensajeError) {
+  if (valor === "") {
+    celda.setBackground(colorIncorrecto).setComment(mensajeError);
+  }
+}
